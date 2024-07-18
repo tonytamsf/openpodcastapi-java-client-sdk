@@ -1,0 +1,925 @@
+openapi: 3.0.3
+info:
+  description: This is the OpenAPI specification for the OpenPodcast API
+  title: OpenPodcast API
+  version: 0.1.0
+servers:
+- url: /
+tags:
+- description: All actions relating to subscription management
+  name: Subscriptions
+paths:
+  /subscriptions:
+    get:
+      description: Retrieve all subscription information that has changed since the
+        provided timestamp
+      operationId: getSubscriptions
+      parameters:
+      - example: 2022-04-23T18:25:43.511Z
+        explode: true
+        in: query
+        name: since
+        required: false
+        schema:
+          format: date-time
+          type: string
+        style: form
+      - example: 1
+        explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: number
+        style: form
+      - example: 5
+        explode: true
+        in: query
+        name: per_page
+        required: false
+        schema:
+          type: number
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscriptions'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Subscriptions'
+          description: Successful operation
+        "401":
+          content:
+            application/json:
+              example:
+                code: 401
+                message: User not authorized
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/xml:
+              example:
+                code: 401
+                message: User not authorized
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unauthorized
+      security:
+      - podcast_auth:
+        - read:subscriptions
+      summary: Retrieve all updated subscription information
+      tags:
+      - Subscriptions
+      x-accepts:
+      - application/json
+      - application/xml
+    post:
+      description: Add one or more new subscriptions for the authenticated user by
+        passing an array of feed URLs in the request body
+      operationId: addSubscription
+      requestBody:
+        $ref: '#/components/requestBodies/FeedArray'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NewSubscriptions'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/NewSubscriptions'
+          description: Successful operation
+        "401":
+          content:
+            application/json:
+              example:
+                code: 401
+                message: User not authorized
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/xml:
+              example:
+                code: 401
+                message: User not authorized
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unauthorized
+        "405":
+          content:
+            application/json:
+              example:
+                code: 405
+                message: Input could not be validated
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/xml:
+              example:
+                code: 405
+                message: Input could not be validated
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Validation exception
+      security:
+      - podcast_auth:
+        - write:subscriptions
+      summary: Add new subscriptions for the authenticated user
+      tags:
+      - Subscriptions
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+      - application/xml
+  /subscriptions/{guid}:
+    delete:
+      description: Deletes a single subscription specified in the path
+      operationId: deleteSubscription
+      parameters:
+      - example: 2d8bb39b-8d34-48d4-b223-a0d01eb27d71
+        explode: false
+        in: path
+        name: guid
+        required: true
+        schema:
+          format: guid
+          type: string
+        style: simple
+      responses:
+        "202":
+          content:
+            application/json:
+              example:
+                deletion_id: 25
+                message: Deletion request was received and will be processed
+              schema:
+                $ref: '#/components/schemas/Success'
+            application/xml:
+              example:
+                deletion_id: 25
+                message: Deletion request was received and will be processed
+              schema:
+                $ref: '#/components/schemas/Success'
+          description: The deletion request has been received and will be processed
+        "401":
+          content:
+            application/json:
+              example:
+                code: 401
+                message: User not authorized
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/xml:
+              example:
+                code: 401
+                message: User not authorized
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unauthorized
+        "404":
+          content:
+            application/json:
+              example:
+                code: 404
+                message: Resource not found
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/xml:
+              example:
+                code: 404
+                message: Resource not found
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Not found
+        "405":
+          content:
+            application/json:
+              example:
+                code: 405
+                message: Input could not be validated
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/xml:
+              example:
+                code: 405
+                message: Input could not be validated
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Validation exception
+      security:
+      - podcast_auth:
+        - write:subscriptions
+      summary: Delete a single subscription entry
+      tags:
+      - Subscriptions
+      x-accepts:
+      - application/json
+      - application/xml
+    get:
+      description: Retrieve information about a single subscription specified in the
+        path
+      operationId: getSubscription
+      parameters:
+      - example: 968cb508-803c-493c-8ff2-9e397dadb83c
+        explode: false
+        in: path
+        name: guid
+        required: true
+        schema:
+          format: guid
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+          description: Successful operation
+        "401":
+          content:
+            application/json:
+              example:
+                code: 401
+                message: User not authorized
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/xml:
+              example:
+                code: 401
+                message: User not authorized
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unauthorized
+        "404":
+          content:
+            application/json:
+              example:
+                code: 404
+                message: Resource not found
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/xml:
+              example:
+                code: 404
+                message: Resource not found
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Not found
+        "405":
+          content:
+            application/json:
+              example:
+                code: 405
+                message: Input could not be validated
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/xml:
+              example:
+                code: 405
+                message: Input could not be validated
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Validation exception
+        "410":
+          content:
+            application/json:
+              example:
+                code: 410
+                message: Subscription has been deleted
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/xml:
+              example:
+                code: 410
+                message: Subscription has been deleted
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Object deleted
+      security:
+      - podcast_auth:
+        - read:subscriptions
+      summary: Retrieve information about a single subscription
+      tags:
+      - Subscriptions
+      x-accepts:
+      - application/json
+      - application/xml
+    patch:
+      description: Update information about a single subscription specified in the
+        path
+      operationId: updateSubscription
+      parameters:
+      - example: 968cb508-803c-493c-8ff2-9e397dadb83c
+        explode: false
+        in: path
+        name: guid
+        required: true
+        schema:
+          format: guid
+          type: string
+        style: simple
+      requestBody:
+        $ref: '#/components/requestBodies/PatchedSubscription'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatchedSubscription'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/PatchedSubscription'
+          description: Successful operation
+        "401":
+          content:
+            application/json:
+              example:
+                code: 401
+                message: User not authorized
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/xml:
+              example:
+                code: 401
+                message: User not authorized
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unauthorized
+        "404":
+          content:
+            application/json:
+              example:
+                code: 404
+                message: Resource not found
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/xml:
+              example:
+                code: 404
+                message: Resource not found
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Not found
+        "405":
+          content:
+            application/json:
+              example:
+                code: 405
+                message: Input could not be validated
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/xml:
+              example:
+                code: 405
+                message: Input could not be validated
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Validation exception
+      security:
+      - podcast_auth:
+        - write:subscriptions
+      summary: Update a single subscription entry
+      tags:
+      - Subscriptions
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+      - application/xml
+  /deletions/{id}:
+    get:
+      description: Retrieve information about a deletion by querying the ID sent in
+        a deletion request
+      operationId: getDeletions
+      parameters:
+      - example: 25
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          format: integer
+          type: number
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              examples:
+                Success:
+                  value:
+                    deletion_id: 25
+                    status: SUCCESS
+                    message: Subscription deleted successfully
+                Pending:
+                  value:
+                    deletion_id: 25
+                    status: PENDING
+                    message: Deletion is pending
+                Failure:
+                  value:
+                    deletion_id: 25
+                    status: FAILURE
+                    message: The deletion process encountered an error and was rolled
+                      backwas rolled back
+              schema:
+                $ref: '#/components/schemas/Deletion'
+            application/xml:
+              examples:
+                Success:
+                  value:
+                    deletion_id: 25
+                    status: SUCCESS
+                    message: Subscription deleted successfully
+                Pending:
+                  value:
+                    deletion_id: 25
+                    status: PENDING
+                    message: Deletion is pending
+                Failure:
+                  value:
+                    deletion_id: 25
+                    status: FAILURE
+                    message: The deletion process encountered an error and was rolled
+                      back
+              schema:
+                $ref: '#/components/schemas/Deletion'
+          description: The object was successfully deleted
+        "401":
+          content:
+            application/json:
+              example:
+                code: 401
+                message: User not authorized
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/xml:
+              example:
+                code: 401
+                message: User not authorized
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unauthorized
+        "404":
+          content:
+            application/json:
+              example:
+                code: 404
+                message: Resource not found
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/xml:
+              example:
+                code: 404
+                message: Resource not found
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Not found
+        "405":
+          content:
+            application/json:
+              example:
+                code: 405
+                message: Input could not be validated
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/xml:
+              example:
+                code: 405
+                message: Input could not be validated
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Validation exception
+      security:
+      - podcast_auth:
+        - read:subscriptions
+      summary: Retrieve information subscription deletion
+      tags:
+      - Subscriptions
+      x-accepts:
+      - application/json
+      - application/xml
+components:
+  requestBodies:
+    FeedArray:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FeedArray'
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/FeedArray'
+      description: An array of feeds the user wants to subscribe to
+    PatchedSubscription:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SubscriptionUpdate'
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/SubscriptionUpdate'
+      description: A request containing new information to update an existing subscription
+        with
+  responses:
+    Unauthorized:
+      content:
+        application/json:
+          example:
+            code: 401
+            message: User not authorized
+          schema:
+            $ref: '#/components/schemas/Error'
+        application/xml:
+          example:
+            code: 401
+            message: User not authorized
+          schema:
+            $ref: '#/components/schemas/Error'
+      description: Unauthorized
+    NotFound:
+      content:
+        application/json:
+          example:
+            code: 404
+            message: Resource not found
+          schema:
+            $ref: '#/components/schemas/Error'
+        application/xml:
+          example:
+            code: 404
+            message: Resource not found
+          schema:
+            $ref: '#/components/schemas/Error'
+      description: Not found
+    ValidationException:
+      content:
+        application/json:
+          example:
+            code: 405
+            message: Input could not be validated
+          schema:
+            $ref: '#/components/schemas/Error'
+        application/xml:
+          example:
+            code: 405
+            message: Input could not be validated
+          schema:
+            $ref: '#/components/schemas/Error'
+      description: Validation exception
+    Gone:
+      content:
+        application/json:
+          example:
+            code: 410
+            message: Subscription has been deleted
+          schema:
+            $ref: '#/components/schemas/Error'
+        application/xml:
+          example:
+            code: 410
+            message: Subscription has been deleted
+          schema:
+            $ref: '#/components/schemas/Error'
+      description: Object deleted
+    DeletionReceived:
+      content:
+        application/json:
+          example:
+            deletion_id: 25
+            message: Deletion request was received and will be processed
+          schema:
+            $ref: '#/components/schemas/Success'
+        application/xml:
+          example:
+            deletion_id: 25
+            message: Deletion request was received and will be processed
+          schema:
+            $ref: '#/components/schemas/Success'
+      description: The deletion request has been received and will be processed
+    DeletionResponse:
+      content:
+        application/json:
+          examples:
+            Success:
+              value:
+                deletion_id: 25
+                status: SUCCESS
+                message: Subscription deleted successfully
+            Pending:
+              value:
+                deletion_id: 25
+                status: PENDING
+                message: Deletion is pending
+            Failure:
+              value:
+                deletion_id: 25
+                status: FAILURE
+                message: The deletion process encountered an error and was rolled
+                  backwas rolled back
+          schema:
+            $ref: '#/components/schemas/Deletion'
+        application/xml:
+          examples:
+            Success:
+              value:
+                deletion_id: 25
+                status: SUCCESS
+                message: Subscription deleted successfully
+            Pending:
+              value:
+                deletion_id: 25
+                status: PENDING
+                message: Deletion is pending
+            Failure:
+              value:
+                deletion_id: 25
+                status: FAILURE
+                message: The deletion process encountered an error and was rolled
+                  back
+          schema:
+            $ref: '#/components/schemas/Deletion'
+      description: The object was successfully deleted
+  schemas:
+    Error:
+      example:
+        code: code
+        message: message
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required:
+      - code
+      - message
+      type: object
+    Success:
+      example:
+        deletion_id: 0.8008281904610115
+        message: message
+      properties:
+        deletion_id:
+          format: integer
+          type: number
+        message:
+          type: string
+      required:
+      - code
+      - message
+      type: object
+    Subscription:
+      example:
+        feed_url: https://example.com/feed2
+        guid: 968cb508-803c-493c-8ff2-9e397dadb83c
+        is_subscribed: true
+      properties:
+        feed_url:
+          format: url
+          type: string
+        guid:
+          format: guid
+          type: string
+        is_subscribed:
+          type: boolean
+        subscription_changed:
+          format: date-time
+          type: string
+        new_guid:
+          format: guid
+          type: string
+        guid_changed:
+          format: date-time
+          type: string
+        deleted:
+          format: date-time
+          type: string
+      required:
+      - feed_url
+      - guid
+      - is_subscribed
+      type: object
+      xml:
+        name: subscription
+    NewSubscription:
+      properties:
+        feed_url:
+          format: url
+          type: string
+        guid:
+          format: guid
+          type: string
+        is_subscribed:
+          type: boolean
+        subscription_changed:
+          format: date-time
+          type: string
+      required:
+      - feed_url
+      - guid
+      - is_subscribed
+      - subscription_changed
+      type: object
+      xml:
+        name: success
+    FailedSubscription:
+      properties:
+        feed_url:
+          format: url
+          type: string
+        message:
+          type: string
+      required:
+      - feed_url
+      - message
+      type: object
+      xml:
+        name: failure
+    Subscriptions:
+      example:
+        total: 2
+        page: 1
+        per_page: 5
+        subscriptions:
+        - feed_url: https://example.com/rss1
+          guid: 31740ac6-e39d-49cd-9179-634bcecf4143
+          is_subscribed: true
+          guid_changed: 2022-09-21T10:25:32.411Z
+          new_guid: 8d1f8f09-4f50-4327-9a63-639bfb1cbd98
+        - feed_url: https://example.com/rss2
+          guid: 968cb508-803c-493c-8ff2-9e397dadb83c
+          is_subscribed: false
+          subscription_changed: 2022-04-24T17:53:21.573Z
+          deleted: 2022-04-24T17:53:21.573Z
+      properties:
+        total:
+          type: number
+        page:
+          type: number
+        per_page:
+          type: number
+        next:
+          format: url
+          type: string
+        previous:
+          format: url
+          type: string
+        subscriptions:
+          items:
+            $ref: '#/components/schemas/Subscription'
+          type: array
+      required:
+      - page
+      - per_page
+      - subscriptions
+      - total
+      type: object
+      xml:
+        name: subscriptions
+    NewSubscriptions:
+      example:
+        success:
+        - feed_url: https://example.com/rss1
+          guid: 8d1f8f09-4f50-4327-9a63-639bfb1cbd98
+          is_subscribed: true
+          subscription_changed: 2023-02-23T14:00:00.000Z
+        - feed_url: https://example.com/rss2
+          guid: 968cb508-803c-493c-8ff2-9e397dadb83c
+          is_subscribed: true
+          subscription_changed: 2023-02-23T14:00:00.000Z
+        - feed_url: https://example.com/rss3
+          guid: e672c1f4-230d-4ab4-99d3-390a9f835ec1
+          is_subscribed: true
+          subscription_changed: 2023-02-23T14:00:00.000Z
+        failure:
+        - feed_url: example.com/rss4
+          message: No protocol present
+      properties:
+        success:
+          items:
+            $ref: '#/components/schemas/NewSubscription'
+          type: array
+        failure:
+          items:
+            $ref: '#/components/schemas/FailedSubscription'
+          type: array
+      type: object
+      xml:
+        name: subscriptions
+    FeedArray:
+      example:
+        subscriptions:
+        - feed_url: https://example.com/feed1
+        - feed_url: https://example.com/feed2
+        - feed_url: https://example.com/feed3
+        - feed_url: example.com/feed4
+          guid: 2d8bb39b-8d34-48d4-b223-a0d01eb27d71
+      properties:
+        subscriptions:
+          example:
+          - feed_url: https://example.com/feed1
+          - feed_url: https://example.com/feed2
+          - feed_url: https://example.com/feed3
+          - feed_url: example.com/feed4
+            guid: 2d8bb39b-8d34-48d4-b223-a0d01eb27d71
+          items:
+            $ref: '#/components/schemas/FeedArray_subscriptions_inner'
+          type: array
+          xml:
+            name: subscription
+      required:
+      - subscriptions
+      type: object
+      xml:
+        name: subscriptions
+    SubscriptionUpdate:
+      example:
+        new_feed_url: https://example.com/rss5
+        new_guid: 965fcecf-ce04-482b-b57c-3119b866cc61
+        is_subscribed: false
+      minProperties: 1
+      properties:
+        new_feed_url:
+          format: url
+          type: string
+        new_guid:
+          format: uuid
+          type: string
+        is_subscribed:
+          type: boolean
+      type: object
+      xml:
+        name: subscription
+    PatchedSubscription:
+      example:
+        new_feed_url: https://example.com/rss5
+        is_subscribed: false
+        subscription_changed: 2023-02-23T14:41:00.000Z
+        guid_changed: 2023-02-23T14:41:00.000Z
+        new_guid: 965fcecf-ce04-482b-b57c-3119b866cc61
+      minProperties: 1
+      properties:
+        new_feed_url:
+          format: url
+          type: string
+        is_subscribed:
+          type: boolean
+        subscription_changed:
+          format: date-time
+          type: string
+        new_guid:
+          format: uuid
+          type: string
+        guid_changed:
+          format: date-time
+          type: string
+      type: object
+      xml:
+        name: subscription
+    Deletion:
+      example:
+        deletion_id: 25
+        status: SUCCESS
+        message: Subscription deleted successfully
+      properties:
+        deletion_id:
+          format: integer
+          type: number
+        status:
+          enum:
+          - SUCCESS
+          - FAILURE
+          - PENDING
+          type: string
+        message:
+          type: string
+      required:
+      - deletion_id
+      - status
+      type: object
+      xml:
+        name: deletion
+    FeedArray_subscriptions_inner:
+      properties:
+        feed_url:
+          type: string
+        guid:
+          type: string
+      required:
+      - feed_url
+      type: object
+  securitySchemes:
+    podcast_auth:
+      flows:
+        implicit:
+          authorizationUrl: https://test.openpodcastapi.com/oauth/authorize
+          scopes:
+            write:subscriptions: modify subscription information for your account
+            read:subscriptions: read your subscription information
+      type: oauth2
+    api_key:
+      in: header
+      name: api_key
+      type: apiKey
+
